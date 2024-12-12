@@ -1,7 +1,11 @@
 #!/usr/bin/env python3
 
 from __future__ import annotations
+
+import os
 import pathlib
+import time
+
 from yandex_cloud_ml_sdk import YCloudML
 from yandex_cloud_ml_sdk.search_indexes import StaticIndexChunkingStrategy, TextSearchIndexType
 
@@ -11,7 +15,9 @@ def local_path(path: str) -> pathlib.Path:
 
 
 def main() -> None:
-    sdk = YCloudML(folder_id="<идентификатор_каталога>", auth="<API-ключ>")
+    os.system('cls')
+
+    sdk = YCloudML(folder_id="b1g21tn2d755llci1hhq", auth="AQVN1aFcZM2fWzgZs5U_0TuJUnCHwbO7OGXVGvwc")
 
     # Загрузим файлы с примерами
     # Файлы будут храниться 5 дней
@@ -47,10 +53,12 @@ def main() -> None:
     assistant = sdk.assistants.create('yandexgpt', tools=[tool])
     thread = sdk.threads.create()
 
-    thread.write("Сколько стоит виза на Бали?")
+    thread.write("Что такое Казахстан?")
     run = assistant.run_stream(thread)
     for event in run:
+        os.system('cls')
         print(f'{event.text}')
+        time.sleep(0.5)
 
     # Удаляем все ненужное
     search_index.delete()
