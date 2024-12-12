@@ -17,7 +17,7 @@ def local_path(path: str) -> pathlib.Path:
 def main() -> None:
     os.system('cls')
 
-    sdk = YCloudML(folder_id="b1g21tn2d755llci1hhq", auth="AQVN1aFcZM2fWzgZs5U_0TuJUnCHwbO7OGXVGvwc")
+    sdk = YCloudML(folder_id="<идентификатор_каталога>", auth="<API-ключ>")
 
     # Загрузим файлы с примерами
     # Файлы будут храниться 5 дней
