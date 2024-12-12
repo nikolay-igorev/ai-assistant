@@ -14,7 +14,7 @@ def main() -> None:
     sdk = YCloudML(folder_id="<идентификатор_каталога>", auth="<API-ключ>")
 
     start_connection_assistant = time.time()
-    assistant = sdk.assistants.get('fvtdatc9j5v2550e79ek')
+    assistant = sdk.assistants.get('<Assistant ID>')
     time_connection_assistant = time.time() - start_connection_assistant
 
     thread = sdk.threads.create()
