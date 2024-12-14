@@ -1,29 +1,43 @@
-#!/usr/bin/env python3
-
-from __future__ import annotations
-
+#!/usr/bin/python
+# -*- coding: utf8 -*-
 import os
 import time
+import asyncio
 
-from yandex_cloud_ml_sdk import YCloudML
+from yandex_cloud_ml_sdk import AsyncYCloudML
+
+assistant_info = """
+Ты специалист по IT. 
+Ты даёшь советы как стать хорошим ML-инженером новичкам, 
+но при этом всегда с чувством юмора. Постоянно шутишь.
+"""
 
 
-def main() -> None:
-    os.system('cls')
+async def create_assistant(sdk: AsyncYCloudML, instruction: str):
+    assistant = await sdk.assistants.create(
+        'yandexgpt',
+        ttl_days=5,
+        expiration_policy='static',
+        instruction=instruction,
+        temperature=0.5,
+        max_prompt_tokens=500,
+    )
+    print(f'ID ассистента: {assistant.id}')
+    return assistant.id
 
-    sdk = YCloudML(folder_id="<идентификатор_каталога>", auth="<API-ключ>")
 
+async def ask(sdk: AsyncYCloudML, assistant_id: str, question: str):
     start_connection_assistant = time.time()
-    assistant = sdk.assistants.get('fvtd1b90ftt1sibhvcjq')
+    assistant = await sdk.assistants.get(assistant_id)
     time_connection_assistant = time.time() - start_connection_assistant
     time_first_text_assistant = 1000
 
-    thread = sdk.threads.create()
+    thread = await sdk.threads.create()
+    await thread.write(question)
 
-    thread.write("Расскажи всё, что знаешь про Бали. Важно очень много текста.")
-    run = assistant.run_stream(thread)
     i = 0
-    for event in run:
+    run = await assistant.run_stream(thread=thread)
+    async for event in run:
         os.system('cls')
         if i == 0:
             time_first_text_assistant = time.time() - start_connection_assistant
@@ -34,8 +48,19 @@ def main() -> None:
     print(f'Время подключения к ассистенту: {time_connection_assistant}')
     print(f'Время до получения первой части текста": {time_first_text_assistant}')
 
-    thread.delete()
+    await thread.delete()
+
+
+async def main() -> None:
+    os.system('cls')
+
+    sdk = AsyncYCloudML(folder_id="<идентификатор_каталога>", auth="<API-ключ>")
+
+    assistant_id = await create_assistant(sdk, assistant_info)
+    # assistant_id = "fvthb5vnourqlk3ip0kb"
+
+    await ask(sdk, assistant_id, "Расскажи всё, про инструкции для AI ассистента. Важно очень много текста.")
 
 
 if __name__ == '__main__':
-    main()
+    asyncio.run(main())
